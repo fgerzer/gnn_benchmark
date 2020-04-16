@@ -1,0 +1,47 @@
+Bootstrap: docker
+
+From: nvidia/cuda:10.1-cudnn7-devel-ubuntu16.04
+
+%files
+    requirements.txt /
+
+%post
+CURDIR=`pwd`
+CPATH=/usr/local/cuda_tmp/include:
+PATH=/usr/local/cuda_tmp/bin:$PATH
+
+apt-get update
+apt-get install -y tmux nano git wget
+
+apt-get install -y --no-install-recommends make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+export PYENV_ROOT=/opt/pyenv
+export PATH="/opt/pyenv/bin:$PATH"
+curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
+pyenv install 3.7.2
+echo 'export PATH=/opt/pyenv/versions/3.7.2/bin/:$PATH' >> $SINGULARITY_ENVIRONMENT
+export PATH=/opt/pyenv/versions/3.7.2/bin/:$PATH
+
+wget -qO - https://www.mongodb.org/static/pgp/server-3.4.asc | apt-key add -
+echo "deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-3.4.list
+apt-get update
+
+apt-get install -y mongodb-org
+
+pip install -r /requirements.txt
+
+mkdir -p /tmp/sing_build_cuda
+cd /tmp/sing_build_cuda
+
+export TORCH_CUDA_ARCH_LIST="5.0 6.1"
+
+export CUDA=cu101
+pip install torch-scatter==latest+${CUDA} torch-sparse==latest+${CUDA} -f https://pytorch-geometric.com/whl/torch-1.4.0.html
+
+git clone https://github.com/rusty1s/pytorch_geometric.git && \
+    cd ./pytorch_geometric && \
+    git checkout 1.4.3 && \
+    python3 ./setup.py install && \
+    cd ..
+
+cd $CURDIR
+rm -rf /tmp/sing_build_cuda
