@@ -1,5 +1,7 @@
 # Graph Neural Networks Benchmarks
 
+> **This is a research repository and a work-in-progress.**
+
 This is a repository bundling several benchmarks (in particularly with
 the goal of integrating the [OGB](https://ogb.stanford.edu/) benchmarks)
 into an easy-to-use framework.
