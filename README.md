@@ -180,3 +180,15 @@ Several results can be found in [the results markdown file](./results.md)
 
 This is licensed under an MIT License; if you have own experiments to
 add, you can simply pull-request. On questions, please raise an issue.
+
+## Acknowledgements
+To further abuse an oft-used quote, this work is only possible because
+I could stand on the shoulders of other libraries. In particular, I'd
+like to thank
+
+- Matthias Fey (@rusty1s), for his work on
+[pytorch_geometric](https://github.com/rusty1s/pytorch_geometric) - I have
+no idea how much time he spends on making that library so impressive,
+but it is definitely worth it.
+- The [OGB team](https://github.com/snap-stanford/ogb) for more complex
+graph benchmarks than we have used before.
