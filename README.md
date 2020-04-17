@@ -172,7 +172,7 @@ for me to store the large numbers of models this produces.
 
 ## Results
 
-These are not yet well-formatted; I will add them later on.
+Several results can be found in [the results markdown file](./results.md)
 
 ## Contributing
 
