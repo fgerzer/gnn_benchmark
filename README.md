@@ -11,7 +11,7 @@ be happy if people got some use out of it.
 
 ### Singularity
 
-The simplest way of using this is to install and use the  
+The simplest way of using this is to install and use the
 [singularity scientific container platform](https://sylabs.io/singularity/).
 For this, follow the [instructions](https://sylabs.io/guides/3.5/admin-guide/installation.html)
 to install singularity, then build the container using
@@ -20,13 +20,13 @@ to install singularity, then build the container using
 sudo singularity build gnn_benchmark.sif gnn_benchmark.singularity
 ```
 which will download and install all required files into the
-`gnn_benchmark.sif`  container.
+`gnn_benchmark.sif` container.
 
-> **_WARNING: CUDA VERSIONS_** Depending on your own setup, you might  
-> need to change the `TORCH_CUDA_ARCH_LIST` variable in the script. My  
-> own GPUs have compute capability of 5.0 (laptop) and 6.1 (server);  
-> including both allows me to use the same image for both. If you  
-> have different cuda versions, you have to change this. Similarly,  
+> **_WARNING: CUDA VERSIONS_** Depending on your own setup, you might
+> need to change the `TORCH_CUDA_ARCH_LIST` variable in the script. My
+> own GPUs have compute capability of 5.0 (laptop) and 6.1 (server);
+> including both allows me to use the same image for both. If you
+> have different cuda versions, you have to change this. Similarly,
 > the image uses CUDA 10.1, so you need a fairly recent driver for your
 > host.
 
@@ -49,7 +49,7 @@ singularity;
 
 The canonical instructions are found in the `gnn_benchmark.singularity`
 file; I've included them here for your convenience but they may be
-outdated - the others are always fresh, since they are used to build  
+outdated - the others are always fresh, since they are used to build
  the image I use.
 
 ```
@@ -66,21 +66,21 @@ git clone https://github.com/rusty1s/pytorch_geometric.git && \
 ## General Workflow
 
 The workflow used here is simple - when starting a new experiment, a
-mongodb collection is initialized, containing all prospective run  
+mongodb collection is initialized, containing all prospective run
 parameters. Afterwards, an arbitrary number of workers can be run,
-pulling their work from the database and writing back results once  
+pulling their work from the database and writing back results once
 finished. This should work for large numbers of workers, but I have not
 yet tested it with more than a dozen concurrent workers.
 
 ## Training
 
-Each experiment (i.e. question to be answered) has its own run and  
+Each experiment (i.e. question to be answered) has its own run and
 evaluation script, found in `gnn_benchmark/experiments/`.
 
 ### Starting the Database
-First, you need to know where the database runs. If you're using your  
+First, you need to know where the database runs. If you're using your
 own, you probably already know this. If you want to use the one packaged
-in the container, navigate to its folder, create the `local_db` folder,  
+in the container, navigate to its folder, create the `local_db` folder,
 and call
 
 `singularity exec --nv -B ./local_db:/data/db mongodb_test.sif mongod`
@@ -98,7 +98,7 @@ This database must run throughout the training and evaluation process.
 
 I'll be using the `tu_graph/benchmark_gnn_layers.py` script as an example.
 
-This script is supposed to answer the question "Which GNN layer works  
+This script is supposed to answer the question "Which GNN layer works
 best on a certain subset of TUD graph datasets". That subset is `MUTAG`,
 `PROTEINS`, `IMDBBinary`, `REDDITBinary`, and `COLLAB`. The script can
 be started with
@@ -114,13 +114,13 @@ There are several command line arguments you have to fill. Specifically:
 - `--data_path`: Where can the data be found (or should be downloaded to).
 
 These values depend on your configuration. If you use a local database,
-it will probably be something like  
+it will probably be something like
 `--db_host "mongodb://localhost:27017" --db_database gnn_benchmark --db_collection tud_gnn_layers`;
 however, the latter two are completely your choice (and if you chose a
 different port, you have to change that as well).
 
 `--data_path` is quite simple; however, be aware that I have not tested
-what happens if you concurrently download the same data in different  
+what happens if you concurrently download the same data in different
 processes. Download it in one, or proceed at your own peril.
 
 Lastly, there are two command line arguments that you can use for training:
@@ -130,7 +130,7 @@ Lastly, there are two command line arguments that you can use for training:
 > **_NOTE_** There is a rough locking mechanism in place. This mechanism
 > ensures that you can start any number of processes that create parameters,
 > but only one does. This also means that only one process ever creates
-> parameters; if that is killed for some reason, you have to delete the  
+> parameters; if that is killed for some reason, you have to delete the
 > collection yourself.
 
 So, a full command might look like this:
@@ -140,7 +140,7 @@ python gnn_benchmark/experiments/tu_graph/benchmark_gnn_layers.py --data_path ..
 ```
 
 Wrapping this in the singularity container is simple: Add
-`singularity exec --nv CMD`. It is possible that there is some  
+`singularity exec --nv CMD`. It is possible that there is some
 interference from your home folder; in that case, you have to explicitly
 bind paths:
 
@@ -162,12 +162,12 @@ singularity exec --nv -B <host_datapath>:/experiment/data -B <host_codepath>:/ex
 
 ## Pre-trained Models
 
-There are no pretrained models, and I am currently not saving any.  
+There are no pretrained models, and I am currently not saving any.
 Several aspects of the current training of GNN models appears to clash
-with common assumptions made for Deep Learning. One of these is the  
+with common assumptions made for Deep Learning. One of these is the
 speed of training. Particularly for semi-supervised node classification,
-you can often train whole models far faster than you'd need for one  
-epoch on an image dataset. Accordingly, it simply does not make sense  
+you can often train whole models far faster than you'd need for one
+epoch on an image dataset. Accordingly, it simply does not make sense
 for me to store the large numbers of models this produces.
 
 ## Results
